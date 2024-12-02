@@ -1,0 +1,40 @@
+name: Docusaurus Deploy
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: write
+
+    steps:
+    - name: Checkout 🛎️
+      uses: actions/checkout@v4
+
+    - name: Use Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: current
+
+    - name: Install dependencies
+      run: yarn install
+
+    - name: Build the website
+      run: yarn docusaurus build
+
+    - name: Create CNAME File
+      run: |
+        echo "docs.atot.tech" > build/CNAME
+
+    - name: Deploy 🚀
+      uses: peaceiris/actions-gh-pages@v4
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./build
+        publish_branch: gh-pages
+        commit_message: 'Build and deploy from GitHub Actions'
